@@ -4,7 +4,6 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 export default function MainPage() {
-
   useEffect(() => {
     const bar = document.getElementById('scrollProgress')
     const onScroll = () => {
@@ -40,26 +39,22 @@ export default function MainPage() {
       <div className="wrapper">
         <div className="container">
           <Navbar />
-
           <header>
             <h1>Saunojen Vuokraus</h1>
             <p className="tagline">Autenttinen puusaunakokemus Suomen luonnossa</p>
           </header>
-
           <div className="special-offer">
             <h2>Talvitarjous</h2>
             <p>Varaa savusauna tammikuussa ja saat 20% alennuksen!</p>
             <p className="price">Vain 64€ / 4h</p>
             <p>Tarjous voimassa 31.1.2025 asti</p>
           </div>
-
           <main>
             <section className="intro-text">
               <h2>Tervetuloa vuokraamaan saunojamme</h2>
               <p>Tarjoamme ainutlaatuisia saunakokemuksia rauhallisissa luonnonympäristöissä. Kaikki saunamme ovat perinteisesti puulämmitteisiä, ja ne sijaitsevat kauniilla paikoilla järvien ja metsien äärellä.</p>
               <p>Saunominen on suomalaisen kulttuurin ydin, ja haluamme tarjota sinulle autenttisen kokemuksen, jossa voit rentoutua ja nauttia luonnon rauhasta.</p>
             </section>
-
             <div className="benefits">
               <h2>Miksi valita meidät?</h2>
               <div className="benefit-list">
@@ -81,12 +76,10 @@ export default function MainPage() {
                 </div>
               </div>
             </div>
-
             <div className="cta-section">
               <Link to="/form" className="cta-button">Ota yhteyttä</Link>
             </div>
           </main>
-
           <Footer />
         </div>
       </div>

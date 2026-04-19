@@ -3,14 +3,13 @@ import { z } from 'zod'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-// Zod-validointikaava
 const schema = z.object({
   name: z.string().min(2, 'Nimi on liian lyhyt (vähintään 2 merkkiä)'),
   email: z.string().email('Sähköpostiosoite ei ole kelvollinen'),
   phone: z.string().regex(/^[0-9\s\+\-]{6,}$/, 'Puhelinnumero ei ole kelvollinen'),
   date: z.string().min(1, 'Valitse päivämäärä'),
   guests: z.coerce.number().min(1, 'Vähintään 1 henkilö').max(12, 'Enintään 12 henkilöä'),
-   terms: z.literal(true).refine(val => val === true, { message: 'Hyväksy ehdot jatkaaksesi' })
+  terms: z.literal(true).refine(val => val === true, { message: 'Hyväksy ehdot jatkaaksesi' })
 })
 
 const today = new Date().toISOString().split('T')[0]
@@ -33,8 +32,6 @@ export default function FormPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-console.log("KLIKKI");
-	  console.log("data: ", form);
 
     const result = schema.safeParse({ ...form, guests: Number(form.guests) })
     if (!result.success) {
@@ -50,7 +47,7 @@ console.log("KLIKKI");
     setResponse(null)
 
     try {
-      const res = await fetch('https://httpbin.org/post', {
+      const res = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -58,13 +55,25 @@ console.log("KLIKKI");
           email: form.email,
           phone: form.phone,
           date: form.date,
-          guests: form.guests,
+          guests: Number(form.guests),
           message: form.message,
           newsletter: form.newsletter
         })
       })
+
       const data = await res.json()
-      setResponse(data)
+
+      if (!res.ok) {
+        setResponse({ error: data.error || 'Tallennus epäonnistui' })
+      } else {
+        setResponse({ success: true, data })
+        // Nollataan lomake onnistuneen lähetyksen jälkeen
+        setForm({
+          name: '', email: '', phone: '',
+          date: '', guests: 2,
+          message: '', newsletter: false, terms: false
+        })
+      }
     } catch {
       setResponse({ error: 'Verkkovirhe — tarkista internetyhteys.' })
     } finally {
@@ -91,7 +100,6 @@ console.log("KLIKKI");
 
             <form className="order-form" onSubmit={handleSubmit} noValidate>
 
-              {/* Kenttäryhmä 1: Henkilötiedot */}
               <fieldset className="visible">
                 <legend>Henkilötiedot</legend>
 
@@ -130,7 +138,6 @@ console.log("KLIKKI");
                 </div>
               </fieldset>
 
-              {/* Kenttäryhmä 2: Varauksen tiedot */}
               <fieldset className="visible">
                 <legend>Varauksen tiedot</legend>
 
@@ -157,7 +164,6 @@ console.log("KLIKKI");
                 </div>
               </fieldset>
 
-              {/* Kenttäryhmä 3: Lisätiedot */}
               <fieldset className="visible">
                 <legend>Lisätiedot</legend>
 
@@ -191,18 +197,16 @@ console.log("KLIKKI");
               </button>
             </form>
 
-            {/* Httpbin-vastaus */}
             {response && (
               <div className="response-box">
-                <h2>Palvelimen vastaus</h2>
                 {response.error ? (
-                  <p className="error-msg">{response.error}</p>
+                  <p className="error-msg">❌ {response.error}</p>
                 ) : (
                   <>
-                    <p className="response-success">✓ Viesti lähetetty onnistuneesti!</p>
-                    <p className="response-label">Lähetetty data:</p>
+                    <p className="response-success">✓ Varaus tallennettu tietokantaan!</p>
+                    <p className="response-label">Tallennetut tiedot:</p>
                     <pre className="response-pre">
-                      {JSON.stringify(response.json, null, 2)}
+                      {JSON.stringify(response.data, null, 2)}
                     </pre>
                   </>
                 )}
